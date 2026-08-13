@@ -143,10 +143,10 @@ document.addEventListener('DOMContentLoaded', () => {
       reset() {
         this.x = Math.random() * width;
         this.y = height + Math.random() * 100;
-        this.size = Math.random() * 3.5 + 1.2;
-        this.speedY = Math.random() * 1.0 + 0.4;
-        this.speedX = (Math.random() - 0.5) * 0.6;
-        this.opacity = Math.random() * 0.6 + 0.3;
+        this.size = Math.random() * 3 + 1;
+        this.speedY = Math.random() * 0.9 + 0.3;
+        this.speedX = (Math.random() - 0.5) * 0.5;
+        this.opacity = Math.random() * 0.5 + 0.3;
 
         const colors = [
           'rgba(255, 153, 51, ',  // Vibrant Saffron
@@ -157,7 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       update() {
         this.y -= this.speedY;
-        this.x += Math.sin(step * 0.025 + this.y * 0.01) * 0.8 + this.speedX;
+        this.x += Math.sin(step * 0.025 + this.y * 0.01) * 0.6 + this.speedX;
         if (this.y < -10) this.reset();
       }
       draw() {
@@ -168,6 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
+    const particleCount = 35;
     for (let i = 0; i < particleCount; i++) {
       particles.push(new Particle());
     }
@@ -176,7 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function drawWaveRibbon(offsetY, waveHeight, wavelength, speed, colorStop1, colorStop2) {
       ctx.beginPath();
       ctx.moveTo(0, height);
-      for (let x = 0; x <= width + 10; x += 8) {
+      for (let x = 0; x <= width + 20; x += 16) {
         const y = offsetY + Math.sin((x * wavelength) + (step * speed)) * waveHeight + Math.cos((x * wavelength * 0.6) + (step * speed * 0.8)) * (waveHeight * 0.45);
         ctx.lineTo(x, y);
       }
@@ -191,24 +192,22 @@ document.addEventListener('DOMContentLoaded', () => {
       ctx.fill();
     }
 
-    // Draw Glowing 24-Spoke Ashoka Chakra Wheel
+    // Draw 24-Spoke Ashoka Chakra Wheel (Optimized: No shadowBlur for 60fps performance)
     function drawAshokaChakra(cx, cy, radius) {
       ctx.save();
       ctx.translate(cx, cy);
       ctx.rotate(chakraAngle);
 
-      const chakraColor = 'rgba(59, 130, 246, 0.45)';
+      const chakraColor = 'rgba(59, 130, 246, 0.55)';
       ctx.strokeStyle = chakraColor;
       ctx.fillStyle = chakraColor;
-      ctx.shadowColor = 'rgba(59, 130, 246, 0.3)';
-      ctx.shadowBlur = 15;
 
-      ctx.lineWidth = 3.5;
+      ctx.lineWidth = 3;
       ctx.beginPath();
       ctx.arc(0, 0, radius, 0, Math.PI * 2);
       ctx.stroke();
 
-      ctx.lineWidth = 2;
+      ctx.lineWidth = 1.8;
       ctx.beginPath();
       ctx.arc(0, 0, radius * 0.2, 0, Math.PI * 2);
       ctx.stroke();
@@ -324,13 +323,33 @@ document.addEventListener('DOMContentLoaded', () => {
   const mobileDrawer = document.getElementById('mobileDrawer');
   const mobileNavLinks = document.querySelectorAll('.mobile-nav-link, .mobile-btn-full');
 
+  let isScrollTicking = false;
   window.addEventListener('scroll', () => {
-    if (window.scrollY > 40) {
-      siteHeader?.classList.add('scrolled');
-    } else {
-      siteHeader?.classList.remove('scrolled');
+    if (!isScrollTicking) {
+      window.requestAnimationFrame(() => {
+        if (window.scrollY > 40) {
+          siteHeader?.classList.add('scrolled');
+        } else {
+          siteHeader?.classList.remove('scrolled');
+        }
+        
+        // Timeline Scroll Line Progress inside throttled loop
+        if (timelineSection && timelineProgress) {
+          const rect = timelineSection.getBoundingClientRect();
+          const totalHeight = rect.height;
+          const currentPos = window.innerHeight - rect.top;
+          
+          if (currentPos > 0 && rect.top < window.innerHeight) {
+            let percentage = (currentPos / (totalHeight + window.innerHeight * 0.5)) * 100;
+            percentage = Math.min(Math.max(percentage, 10), 100);
+            timelineProgress.style.height = `${percentage}%`;
+          }
+        }
+        isScrollTicking = false;
+      });
+      isScrollTicking = true;
     }
-  });
+  }, { passive: true });
 
   if (mobileMenuBtn && mobileDrawer) {
     mobileMenuBtn.addEventListener('click', () => {
@@ -374,22 +393,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   revealElements.forEach(el => revealObserver.observe(el));
 
-  // Timeline Scroll Line Progress
   const timelineProgress = document.getElementById('timelineProgress');
   const timelineSection = document.getElementById('timeline');
-
-  window.addEventListener('scroll', () => {
-    if (!timelineSection || !timelineProgress) return;
-    const rect = timelineSection.getBoundingClientRect();
-    const totalHeight = rect.height;
-    const currentPos = window.innerHeight - rect.top;
-    
-    if (currentPos > 0 && rect.top < window.innerHeight) {
-      let percentage = (currentPos / (totalHeight + window.innerHeight * 0.5)) * 100;
-      percentage = Math.min(Math.max(percentage, 10), 100);
-      timelineProgress.style.height = `${percentage}%`;
-    }
-  });
 
   /* ------------------------------------------------------------------------
      05. FAQ ACCORDION TOGGLE
