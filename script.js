@@ -126,7 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let step = 0;
     let chakraAngle = 0;
     const particles = [];
-    const particleCount = 60;
+    const particleCount = 35;
 
     function resizeCanvas() {
       width = canvas.width = window.innerWidth;
@@ -168,7 +168,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    const particleCount = 35;
     for (let i = 0; i < particleCount; i++) {
       particles.push(new Particle());
     }
@@ -323,6 +322,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const mobileDrawer = document.getElementById('mobileDrawer');
   const mobileNavLinks = document.querySelectorAll('.mobile-nav-link, .mobile-btn-full');
 
+  const timelineProgress = document.getElementById('timelineProgress');
+  const timelineSection = document.getElementById('timeline');
+
   let isScrollTicking = false;
   window.addEventListener('scroll', () => {
     if (!isScrollTicking) {
@@ -392,9 +394,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   revealElements.forEach(el => revealObserver.observe(el));
-
-  const timelineProgress = document.getElementById('timelineProgress');
-  const timelineSection = document.getElementById('timeline');
 
   /* ------------------------------------------------------------------------
      05. FAQ ACCORDION TOGGLE
